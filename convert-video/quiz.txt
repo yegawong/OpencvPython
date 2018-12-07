@@ -1,0 +1,37 @@
+Description: Given a colored video file, please transform it into a B&W version.
+
+Stage I: Download a sample video file online (e.g., from
+https://github.com/opencv/opencv/tree/master/samples/data), and use OpenCV to
+load the video, read each frame, convert it to B&W, and then save as a new
+video.
+
+You need to provide the source code as well as a README.md written in Markdown
+format explaining how to build and run it. Your binary needs to take a required
+argument of "--input" specifying the path to the input video file, as well as
+"--output" specifying the path to the output video file or "output.avi" by
+default. If run with no argument, the program should show the usage with clear
+explanation of the needed arguments.
+
+Stage II: As each frame can be processed in parallel, let's add multi-thread or
+multi-process capability to your program. The main thread/process should not be
+blocked by each frame being processed. It should read a frame, give it to a
+thread/process to handle with, and immediately move on to read the next frame
+without waiting for the previous frame's result. It is up to you to choose
+thread or process.
+
+You need to add an extra argument of "--parallel" indicating the number of
+threads or processes to run, defaulting to 1. Let's say the argument is given a
+value of 4. After reading a frame from the video stream, instead of directly
+converting the frame, you need to send the frame to a dispatcher, where a new
+thread or process (or an existing vacant one) will be spawned to do the
+conversion. You may be tempted to do the frame saving from the thread/process.
+However, there is a risk of competition between threads/processes to output an
+out-of-order video. What you need to do is actually coordinate the order from
+the main thread/process, but don't block the main thread/process for reading
+frames. A solution where you read a frame, send it to the dispatcher, and then
+block on the new thread/process to finish before reading the next frame, is not
+an acceptable one, since it doesn't benefit from parallelization at all.
+
+Language: Python and C are both valid choices, although personally I'd recommend
+Python because its threading or multiprocessing module is easier to use. Also,
+installing OpenCV with Python binding is as simple as one-line pip command.
